@@ -1,0 +1,16 @@
+{
+  "name": "better-directory-sort",
+  "version": "0.0.0",
+  "description": "Improved sorting order for directory entities",
+  "main": "index.js",
+  "repository": "https://github.com/jamiebuilds/better-directory-sort",
+  "author": "Jamie Kyle <me@thejameskyle.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "ava"
+  },
+  "devDependencies": {
+    "ava": "^0.25.0",
+    "flow-bin": "^0.81.0"
+  }
+}
