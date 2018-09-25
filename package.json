@@ -1,6 +1,6 @@
 {
   "name": "better-directory-sort",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Improved sorting order for directory entities",
   "main": "index.js",
   "repository": "https://github.com/jamiebuilds/better-directory-sort",
