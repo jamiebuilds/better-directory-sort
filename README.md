@@ -19,34 +19,34 @@ SettingsForm.ts
 Which is backwards from what developers would expect: The test file is
 secondary to the source file it is testing.
 
-Taken to an extreme you end up with this:
+**Before:**
 
 ```
-  SettingsForm.admin.example.tsx
-  SettingsForm.default.example.tsx
-  SettingsForm.docs.mdx
-  SettingsForm.test.ts
+SettingsForm.admin.example.tsx
+SettingsForm.default.example.tsx
+SettingsForm.docs.mdx
+SettingsForm.test.ts
 SettingsForm.tsx
-  SettingsFormConfirmationDialog.admin.example.tsx
-  SettingsFormConfirmationDialog.default.example.tsx
-  SettingsFormConfirmationDialog.docs.mdx
-  SettingsFormConfirmationDialog.test.ts
+SettingsFormConfirmationDialog.admin.example.tsx
+SettingsFormConfirmationDialog.default.example.tsx
+SettingsFormConfirmationDialog.docs.mdx
+SettingsFormConfirmationDialog.test.ts
 SettingsFormConfirmationDialog.tsx
 ```
 
-Instead of that, this sorting algorithm will place files like this:
+**After:**
 
 ```
 SettingsForm.tsx
-  SettingsForm.admin.example.tsx
-  SettingsForm.default.example.tsx
-  SettingsForm.docs.mdx
-  SettingsForm.test.ts
+SettingsForm.admin.example.tsx
+SettingsForm.default.example.tsx
+SettingsForm.docs.mdx
+SettingsForm.test.ts
 SettingsFormConfirmationDialog.tsx
-  SettingsFormConfirmationDialog.admin.example.tsx
-  SettingsFormConfirmationDialog.default.example.tsx
-  SettingsFormConfirmationDialog.docs.mdx
-  SettingsFormConfirmationDialog.test.ts
+SettingsFormConfirmationDialog.admin.example.tsx
+SettingsFormConfirmationDialog.default.example.tsx
+SettingsFormConfirmationDialog.docs.mdx
+SettingsFormConfirmationDialog.test.ts
 ```
 
 Oh and directories are still placed first too.
@@ -63,7 +63,6 @@ yarn add better-directory-sort
 
 ```js
 const betterDirectorySort = require('better-directory-sort');
-const fs = require('fs');
 
 let ents = [
   { name: 'utils', isDirectory: true },
@@ -74,4 +73,18 @@ let ents = [
 ];
 
 let sorted = ents.sort(betterDirectorySort);
+```
+
+```js
+const betterDirectorySort = require('better-directory-sort');
+const fs = require('fs');
+
+let ents = fs.readdirSync('/path/to/dir', { withFileTypes: true }); // Node >=10.10
+
+let sorted = ents.sort((a, b) => {
+  return betterDirectorySort(
+    { name: a.name, isDirectory: a.isDirectory() },
+    { name: b.name, isDirectory: b.isDirectory() },
+  );
+});
 ```
