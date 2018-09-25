@@ -1,5 +1,10 @@
 // @flow
 
+let collator = new Intl.Collator(undefined, {
+  numeric: true,
+  sensitivity: 'base',
+});
+
 /*::
 type Entity = {
   name: string,
@@ -41,14 +46,14 @@ function betterDirectorySort(a /*: Entity */, b /*: Entity */) /*: number */ {
     if (bPart && !aPart) return -1;
 
     // compare the current part, if its the same, continue comparing parts
-    let compared = aPart.localeCompare(bPart);
+    let compared = collator.compare(aPart, bPart);
     if (compared !== 0) return compared;
 
     i++;
   }
 
   // compare the last part as a final tie-breaker
-  return aExt.localeCompare(bExt);
+  return collator.compare(aExt, bExt);
 }
 
 module.exports = betterDirectorySort;
