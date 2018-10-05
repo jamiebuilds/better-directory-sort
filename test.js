@@ -125,3 +125,33 @@ test('real world expectations', t => {
     { name: 'SettingsFormConfirmationDialog.test.ts', isDirectory: false },
   ]);
 });
+
+test('custom comparator', t => {
+  let input = Object.freeze([
+    { name: 'Ab', isDirectory: false },
+    { name: 'ab', isDirectory: false },
+    { name: 'aa', isDirectory: false },
+    { name: 'Aa', isDirectory: false },
+  ]);
+
+  t.deepEqual(input.slice().sort(betterDirectorySort), [
+    { name: 'aa', isDirectory: false },
+    { name: 'Aa', isDirectory: false },
+    { name: 'Ab', isDirectory: false },
+    { name: 'ab', isDirectory: false },
+  ]);
+
+  function comparator(a, b) {
+    return a.localeCompare(b, undefined, {
+      numeric: true,
+      sensitivity: 'case',
+    });
+  }
+
+  t.deepEqual(input.slice().sort(betterDirectorySort.custom(comparator)), [
+    { name: 'aa', isDirectory: false },
+    { name: 'Aa', isDirectory: false },
+    { name: 'ab', isDirectory: false },
+    { name: 'Ab', isDirectory: false },
+  ]);
+});
