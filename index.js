@@ -7,6 +7,13 @@ function defaultComparator(a, b) {
   });
 }
 
+function compareSafe(a, b, comparator) {
+  if (a == null && b == null) return 0;
+  if (a != null && b == null) return 1;
+  if (b != null && a == null) return -1;
+  return comparator(a, b);
+}
+
 /*::
 type Comparator<T> = (a: T, b: T) => number;
 
@@ -14,11 +21,18 @@ type Entity = {
   name: string,
   isDirectory: boolean,
 };
+
+type Opts = {
+  comparator?: Comparator<string>,
+  kinds?: boolean,
+};
 */
 
-function createBetterDirectorySort(comparator /*: Comparator<string> */) /*: Comparator<Entity> */ {
-  return function betterDirectorySort(a, b) {
+function createBetterDirectorySort(opts /*: Opts */ = {}) /*: Comparator<Entity> */ {
+  let comparator = opts.comparator || defaultComparator;
+  let kinds = opts.kinds || false;
 
+  return function betterDirectorySort(a, b) {
     // directories should be placed before files
     if (a.isDirectory && !b.isDirectory) return -1;
     if (b.isDirectory && !a.isDirectory) return 1;
@@ -33,36 +47,48 @@ function createBetterDirectorySort(comparator /*: Comparator<string> */) /*: Com
     let aParts = a.name.split('.');
     let bParts = b.name.split('.');
 
-    // final part is only used when the rest of the name is the same
+    // the first part of the name is the most important part
+    let aName = aParts.shift();
+    let bName = bParts.shift();
+
+    // final extension is only used when all else is the same
     let aExt = aParts.pop();
     let bExt = bParts.pop();
 
-    // loop with an incrementing index
+    let comparedName = compareSafe(aName, bName, comparator);
+    if (comparedName !== 0) return comparedName;
+
+    // "kind" extension is used above other parts
+    if (kinds) {
+      let aKind = aParts.pop();
+      let bKind = bParts.pop();
+
+      let comparedKind = compareSafe(aKind, bKind, comparator);
+      if (comparedKind !== 0) return comparedKind;
+    }
+
+    // loop with an decrementing index
     let i = 0;
     while (true) {
       let aPart = aParts[i];
       let bPart = bParts[i];
 
       // if there's no more parts on either name, break
-      if (!aPart && !bPart) break;
-
-      // prefer names with less parts
-      if (aPart && !bPart) return 1;
-      if (bPart && !aPart) return -1;
+      if (aPart == null && bPart == null) break;
 
       // compare the current part, if its the same, continue comparing parts
-      let compared = comparator(aPart, bPart);
-      if (compared !== 0) return compared;
+      let comparedPart = compareSafe(aPart, bPart, comparator);
+      if (comparedPart !== 0) return comparedPart;
 
       i++;
     }
 
-    // compare the last part as a final tie-breaker
-    return comparator(aExt, bExt);
+    // compare the last extension as a final tie-breaker
+    return compareSafe(aExt, bExt, comparator);
   };
 }
 
-const betterDirectorySort = createBetterDirectorySort(defaultComparator);
+const betterDirectorySort = createBetterDirectorySort();
 
 betterDirectorySort.custom = createBetterDirectorySort;
 betterDirectorySort.defaultComparator = defaultComparator;

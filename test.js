@@ -126,7 +126,7 @@ test('real world expectations', t => {
   ]);
 });
 
-test('custom comparator', t => {
+test('opts.comparator', t => {
   let input = Object.freeze([
     { name: 'Ab', isDirectory: false },
     { name: 'ab', isDirectory: false },
@@ -148,10 +148,26 @@ test('custom comparator', t => {
     });
   }
 
-  t.deepEqual(input.slice().sort(betterDirectorySort.custom(comparator)), [
+  t.deepEqual(input.slice().sort(betterDirectorySort.custom({ comparator })), [
     { name: 'aa', isDirectory: false },
     { name: 'Aa', isDirectory: false },
     { name: 'ab', isDirectory: false },
     { name: 'Ab', isDirectory: false },
+  ]);
+});
+
+test('opts.kinds', t => {
+  t.deepEqual([
+    { name: 'name.kindB.ext', isDirectory: false },
+    { name: 'name.kindB.ext', isDirectory: false },
+    { name: 'name.z.kindA.ext', isDirectory: false },
+    { name: 'name.a.kindA.ext', isDirectory: false },
+    { name: 'name.ext', isDirectory: false },
+  ].sort(betterDirectorySort.custom({ kinds: true })), [
+    { name: 'name.ext', isDirectory: false },
+    { name: 'name.a.kindA.ext', isDirectory: false },
+    { name: 'name.z.kindA.ext', isDirectory: false },
+    { name: 'name.kindB.ext', isDirectory: false },
+    { name: 'name.kindB.ext', isDirectory: false },
   ]);
 });
